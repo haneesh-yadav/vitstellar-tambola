@@ -5,7 +5,6 @@ import NumberBoard from '../components/NumberBoard';
 import WinnerBanner from '../components/WinnerBanner';
 import { toast, ToastContainer } from '../components/Toast';
 import './Host.css';
-const HOST_KEY = 'cosmicwalk2026';
 
 const WIN_LABELS = {
   topLine: 'Top Line',
@@ -35,25 +34,6 @@ export default function Host() {
   const [currentNumAnim, setCurrentNumAnim] = useState(false);
   const [showPlayers, setShowPlayers] = useState(false);
   const [showReset, setShowReset] = useState(false);
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem('host_authed') === 'true');
-  const [keyInput, setKeyInput] = useState('');
-  const [keyError, setKeyError] = useState('');
-
-  function handleLogin() {
-    if (keyInput === HOST_KEY) {
-      sessionStorage.setItem('host_authed', 'true');
-      setAuthed(true);
-      setKeyError('');
-    } else {
-      setKeyError('Incorrect key. Try again.');
-    }
-  }
-
-  function handleLogout() {
-    sessionStorage.removeItem('host_authed');
-    setAuthed(false);
-    setKeyInput('');
-  }
   const prevNumRef = useRef(null);
 
   useEffect(() => {
@@ -187,38 +167,6 @@ export default function Host() {
     { key: 'fullHouse', label: 'Full House', icon: 'home' },
   ];
 
-  if (!authed) {
-    return (
-      <div className="host-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-        <div style={{ background: 'var(--bg2)', border: '1.5px solid var(--border2)', borderRadius: 'var(--radius)', padding: '32px 24px', width: '100%', maxWidth: 360 }}>
-          <div className="club-badge" style={{ marginBottom: 24, justifyContent: 'center' }}>
-            <img src="/stellar.png" alt="VIT-STELLAR" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-            <span>VIT-STELLAR</span>
-          </div>
-          <h2 style={{ color: 'var(--text)', marginBottom: 6, fontSize: 20 }}>Host Login</h2>
-          <p style={{ color: 'var(--text3)', fontSize: 13, marginBottom: 20 }}>Enter the host key to access the control panel.</p>
-          <input
-            type="password"
-            placeholder="Enter host key..."
-            value={keyInput}
-            onChange={e => setKeyInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border2)', background: 'var(--bg3)', color: 'var(--text)', fontSize: 14, marginBottom: 8, boxSizing: 'border-box' }}
-          />
-          {keyError && <p style={{ color: 'var(--red)', fontSize: 12, marginBottom: 12 }}>{keyError}</p>}
-          <button className="btn btn-gold" style={{ width: '100%', marginTop: 8 }} onClick={handleLogin}>
-            <span className="material-icons">lock_open</span>
-            Login
-          </button>
-          <button className="btn btn-outline" style={{ width: '100%', marginTop: 10 }} onClick={() => navigate('/')}>
-            <span className="material-icons">arrow_back</span>
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="host-page">
       {/* Header */}
@@ -229,10 +177,7 @@ export default function Host() {
           </button>
           <div>
             <h1 className="host-title">Host Panel</h1>
-            <div className="club-badge" style={{ marginTop: 2 }}>
-              <img src="/stellar.png" alt="VIT-STELLAR" style={{ width: 16, height: 16, objectFit: 'contain' }} />
-              <span style={{ fontSize: 11 }}>VIT-STELLAR</span>
-            </div>
+            <p className="host-sub">VIT-STELLAR Tambola</p>
           </div>
         </div>
         <div className="host-header-right">
@@ -244,10 +189,6 @@ export default function Host() {
             <span className="material-icons">group</span>
             {gameState.playerCount}
           </div>
-          <button className="btn btn-outline" style={{ fontSize: 12, padding: '6px 12px' }} onClick={handleLogout}>
-            <span className="material-icons" style={{ fontSize: 16 }}>logout</span>
-            Logout
-          </button>
         </div>
       </header>
 
