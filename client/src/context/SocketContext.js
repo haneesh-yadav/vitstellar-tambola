@@ -11,11 +11,12 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     const socket = io(SERVER_URL, {
-      transports: ['polling', 'websocket'],
-      upgrade: true,
+      transports: ['polling'],
       reconnection: true,
-      reconnectionAttempts: 10,
+      reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
     });
     socketRef.current = socket;
 
