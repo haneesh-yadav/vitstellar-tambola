@@ -14,7 +14,11 @@ const io = new Server(server, {
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
 // ─── Game State ──────────────────────────────────────────────────────────────
@@ -378,3 +382,9 @@ app.get('/health', (_, res) => res.json({ ok: true, players: Object.keys(gameSta
 resetGame();
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`🎯 Tambola server running on port ${PORT}`));
+
+
+// Keep-alive ping
+setInterval(() => {
+  console.log('keepalive');
+}, 1000 * 60 * 4); // every 4 minutes
