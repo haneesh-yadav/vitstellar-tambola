@@ -11,8 +11,7 @@ export function SocketProvider({ children }) {
 
   useEffect(() => {
     const socket = io(SERVER_URL, { 
-      transports: ['polling', 'websocket'],
-      upgrade: true
+      transports: ['websocket', 'polling']
     });
     socketRef.current = socket;
 
