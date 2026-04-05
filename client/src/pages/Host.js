@@ -55,6 +55,7 @@ export default function Host() {
     sessionStorage.removeItem('host_authed');
     setAuthed(false);
     setKeyInput('');
+    setKeyError('');
   }
 
   useEffect(() => {
@@ -415,21 +416,17 @@ export default function Host() {
             <span className="material-icons">restart_alt</span>
             Reset Game
           </button>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+            <p className="danger-desc">Logging out will require the host key to access this panel again.</p>
+            <button className="btn btn-outline" onClick={handleLogout}>
+              <span className="material-icons">logout</span>
+              Logout
+            </button>
+          </div>
         </section>
       </div>
 
-      {/* Logout */}
-      <section className="card" style={{ marginTop: 8 }}>
-        <div className="section-header">
-          <span className="material-icons">logout</span>
-          Session
-        </div>
-        <p className="danger-desc">Logging out will require the host key to access this panel again.</p>
-        <button className="btn btn-outline" onClick={handleLogout}>
-          <span className="material-icons">logout</span>
-          Logout
-        </button>
-      </section>
+      
 
       {/* Players modal */}
       {showPlayers && (
