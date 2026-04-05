@@ -1,0 +1,53 @@
+.numboard {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.numboard-grid {
+  display: flex;
+  gap: 4px;
+  min-width: 360px;
+}
+
+.numboard-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.numball {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text3);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  min-height: 28px;
+}
+
+.numball--called {
+  background: var(--gold-dim);
+  border-color: rgba(245,200,66,0.3);
+  color: var(--gold);
+}
+
+.numball--current {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #0a0a0f !important;
+  font-weight: 800;
+  font-size: 13px;
+  animation: pulse 0.6s ease;
+  box-shadow: 0 0 16px rgba(245,200,66,0.5);
+}
+
+@media (max-width: 600px) {
+  .numball { font-size: 9px; min-height: 22px; border-radius: 4px; }
+  .numball--current { font-size: 10px; }
+}

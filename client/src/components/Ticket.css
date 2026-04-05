@@ -1,0 +1,250 @@
+.ticket-wrapper {
+  width: 100%;
+}
+
+.ticket {
+  background: var(--bg2);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  user-select: none;
+}
+
+.ticket-headers {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.col-header {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.5px;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.ticket-row:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+  min-height: 42px;
+  transition: background 0.2s, transform 0.15s;
+  flex-direction: column;
+}
+
+.cell:last-child { border-right: none; }
+
+.cell-empty {
+  background: var(--bg3);
+}
+
+.cell-num {
+  background: var(--surface);
+  cursor: default;
+}
+
+.cell-num .cell-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  transition: opacity 0.2s;
+}
+
+/* Number is currently callable — player can tap it */
+.cell-open {
+  background: rgba(91,156,246,0.12) !important;
+  border-color: rgba(91,156,246,0.25) !important;
+  cursor: pointer !important;
+  animation: openPulse 1.2s ease-in-out infinite;
+}
+
+.cell-open .cell-value {
+  color: var(--blue) !important;
+  font-weight: 700 !important;
+}
+
+.cell-open:active {
+  transform: scale(0.9);
+}
+
+/* Player tapped — marked! */
+.cell-marked {
+  background: var(--gold-dim) !important;
+  border-color: rgba(245,200,66,0.2) !important;
+  cursor: default !important;
+}
+
+.cell-marked .cell-value {
+  color: var(--gold) !important;
+}
+
+.cell-marked .cell-check {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 10px !important;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+/* Player missed the window */
+.cell-missed {
+  background: rgba(224,92,107,0.06) !important;
+  border-color: rgba(224,92,107,0.1) !important;
+  cursor: not-allowed !important;
+}
+
+.cell-missed .cell-value {
+  color: var(--text3) !important;
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.cell-corner.cell-marked {
+  background: rgba(245,200,66,0.18) !important;
+}
+
+/* Tap hint icon inside open cell */
+.cell-tap-hint {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 9px !important;
+  color: var(--blue);
+  opacity: 0.7;
+}
+
+/* Tap hint banner above claim section */
+.tap-hint-banner {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(91,156,246,0.1);
+  border: 1px solid rgba(91,156,246,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 600;
+  animation: openPulse 1.2s ease-in-out infinite;
+}
+
+.tap-hint-banner .material-icons { font-size: 18px; }
+
+@keyframes openPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Claim section */
+.claim-section {
+  margin-top: 20px;
+}
+
+.claim-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.claim-title .material-icons { font-size: 16px; color: var(--gold); }
+
+.claim-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.claim-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.claim-btn .material-icons { font-size: 20px; }
+
+.claim-btn:not(:disabled):hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-dim);
+  transform: translateY(-1px);
+}
+
+.claim-btn:disabled {
+  cursor: not-allowed;
+}
+
+.claim-btn--ready {
+  border-color: rgba(245,200,66,0.4) !important;
+  color: var(--gold) !important;
+  background: var(--gold-dim) !important;
+  animation: pulse 1.5s infinite;
+}
+
+.claim-btn--won {
+  background: var(--bg3) !important;
+  border-color: var(--border) !important;
+  color: var(--text3) !important;
+  opacity: 0.6;
+}
+
+.claim-btn--mine {
+  background: rgba(76,175,130,0.1) !important;
+  border-color: rgba(76,175,130,0.3) !important;
+  color: var(--green) !important;
+}
+
+.ready-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse 1s infinite;
+}
+
+@media (max-width: 380px) {
+  .cell { min-height: 36px; }
+  .cell-num .cell-value { font-size: 11px; }
+  .claim-buttons { grid-template-columns: repeat(2, 1fr); }
+}

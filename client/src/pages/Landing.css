@@ -1,0 +1,232 @@
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+.landing-glow {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse, rgba(124,111,205,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.landing-content {
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.club-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,200,66,0.3);
+  border-radius: 99px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.club-badge .material-icons { font-size: 16px; }
+
+.landing-title h1 {
+  line-height: 1;
+}
+
+.title-main {
+  display: block;
+  font-size: clamp(64px, 14vw, 112px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, #f5c842 0%, #fff8e0 40%, #f5c842 60%, #e8a000 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+.title-sub {
+  color: var(--text2);
+  font-size: 15px;
+  font-weight: 400;
+  margin-top: 10px;
+}
+
+.conn-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.landing-cards {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.landing-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.landing-card--play::before {
+  background: linear-gradient(135deg, var(--gold-dim), transparent);
+}
+
+.landing-card--host::before {
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+}
+
+.landing-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border2);
+}
+
+.landing-card--play:hover {
+  border-color: rgba(245,200,66,0.3);
+  box-shadow: 0 8px 30px var(--gold-glow);
+}
+
+.landing-card--host:hover {
+  border-color: rgba(124,111,205,0.3);
+  box-shadow: 0 8px 30px var(--accent-glow);
+}
+
+.landing-card:hover::before {
+  opacity: 1;
+}
+
+.lcard-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.landing-card--play .lcard-icon {
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+
+.landing-card--host .lcard-icon {
+  background: var(--accent-glow);
+  color: var(--accent2);
+}
+
+.lcard-icon .material-icons { font-size: 24px; }
+
+.lcard-text {
+  flex: 1;
+}
+
+.lcard-text h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text2);  
+}
+
+.lcard-text p {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+.lcard-arrow {
+  color: var(--text3);
+  transition: transform 0.2s, color 0.2s;
+}
+
+.landing-card:hover .lcard-arrow {
+  transform: translateX(4px);
+  color: var(--text2);
+}
+
+.rules-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.rule-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text2);
+}
+
+.rule-chip .material-icons { font-size: 14px; color: var(--gold); }
+
+.footer-note {
+  color: var(--text3);
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .landing { padding: 16px; }
+  .landing-content { gap: 24px; }
+  .landing-card { padding: 18px; gap: 14px; }
+  .lcard-text h2 { font-size: 16px; }
+}

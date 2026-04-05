@@ -1,0 +1,84 @@
+.winner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.winner-overlay.visible {
+  opacity: 1;
+}
+
+.winner-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: confetti 3s ease-in forwards;
+}
+
+.winner-card {
+  background: var(--surface);
+  border: 1.5px solid rgba(245,200,66,0.3);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+  animation: numberPop 0.5s ease both;
+  box-shadow: 0 0 60px rgba(245,200,66,0.2), var(--shadow);
+}
+
+.winner-card--fullhouse {
+  border-color: rgba(245,200,66,0.6);
+  animation: winnerGlow 2s infinite, numberPop 0.5s ease both;
+}
+
+.winner-icon {
+  font-size: 56px;
+  line-height: 1;
+  animation: pulse 1s infinite;
+}
+
+.winner-type {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-dim);
+  padding: 5px 14px;
+  border-radius: 99px;
+  border: 1px solid rgba(245,200,66,0.3);
+}
+
+.winner-name {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 4px 0;
+}
+
+.winner-sub {
+  font-size: 14px;
+  color: var(--text2);
+}
