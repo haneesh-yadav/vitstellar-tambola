@@ -25,7 +25,7 @@ export default function Landing() {
           <h1>
             <span className="title-main">TAMBOLA</span>
           </h1>
-          <p className="title-sub">The official housie game for VIT-STELLAR events</p>
+          <p className="title-sub">The official housie game for Cosmic Walk 4.0</p>
         </div>
 
         {/* Connection status */}
