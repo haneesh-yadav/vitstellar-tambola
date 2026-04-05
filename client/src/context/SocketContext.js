@@ -10,21 +10,22 @@ export function SocketProvider({ children }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const socket = io(SERVER_URL, {
-      transports: ['polling'],
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      timeout: 20000,
-    });
-    socketRef.current = socket;
+  const socket = io(SERVER_URL, {
+    transports: ['polling', 'websocket'],
+    upgrade: true,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 10000,
+    timeout: 60000,
+  });
 
-    socket.on('connect', () => setConnected(true));
-    socket.on('disconnect', () => setConnected(false));
+  socketRef.current = socket;
+  socket.on('connect', () => setConnected(true));
+  socket.on('disconnect', () => setConnected(false));
 
-    return () => socket.disconnect();
-  }, []);
+  return () => socket.disconnect();
+}, []);
 
   return (
     <SocketContext.Provider value={{ socket: socketRef.current, connected }}>
