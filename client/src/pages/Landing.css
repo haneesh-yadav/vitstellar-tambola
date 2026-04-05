@@ -217,6 +217,12 @@
   color: var(--text2);
 }
 
+.club-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
 .rule-chip .material-icons { font-size: 14px; color: var(--gold); }
 
 .footer-note {
