@@ -1,5 +1,7 @@
 .ticket-wrapper {
   width: 100%;
+   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ticket {
@@ -8,6 +10,8 @@
   border-radius: var(--radius);
   overflow: hidden;
   user-select: none;
+  min-width: 280px; /* prevents shrinking too small */
+  width: 100%;
 }
 
 .ticket-headers {
@@ -243,8 +247,53 @@
   animation: pulse 1s infinite;
 }
 
-@media (max-width: 380px) {
-  .cell { min-height: 36px; }
-  .cell-num .cell-value { font-size: 11px; }
-  .claim-buttons { grid-template-columns: repeat(2, 1fr); }
+
+
+@media (max-width: 480px) {
+  .cell {
+    min-height: 36px;
+    overflow: hidden;
+  }
+
+  .cell-value {
+    font-size: 11px !important;
+  }
+
+  .col-header {
+    font-size: 8px;
+    padding: 6px 2px;
+  }
+
+  .cell-check,
+  .cell-tap-hint {
+    display: none !important;
+  }
+
+  .claim-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .claim-btn {
+    padding: 10px 4px;
+    font-size: 9px;
+  }
+
+  .claim-btn .material-icons {
+    font-size: 16px;
+  }
+
+  .tap-hint-banner {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .cell {
+    min-height: 30px;
+  }
+
+  .cell-value {
+    font-size: 10px !important;
+  }
 }
