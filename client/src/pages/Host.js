@@ -5,6 +5,7 @@ import NumberBoard from '../components/NumberBoard';
 import WinnerBanner from '../components/WinnerBanner';
 import { toast, ToastContainer } from '../components/Toast';
 import './Host.css';
+const HOST_KEY = 'cosmicwalk2026';
 
 const WIN_LABELS = {
   topLine: 'Top Line',
@@ -35,6 +36,26 @@ export default function Host() {
   const [showPlayers, setShowPlayers] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const prevNumRef = useRef(null);
+
+  const [authed, setAuthed] = useState(() => sessionStorage.getItem('host_authed') === 'true');
+  const [keyInput, setKeyInput] = useState('');
+  const [keyError, setKeyError] = useState('');
+
+  function handleLogin() {
+    if (keyInput === HOST_KEY) {
+      sessionStorage.setItem('host_authed', 'true');
+      setAuthed(true);
+      setKeyError('');
+    } else {
+      setKeyError('Incorrect key. Try again.');
+    }
+  }
+
+  function handleLogout() {
+    sessionStorage.removeItem('host_authed');
+    setAuthed(false);
+    setKeyInput('');
+  }
 
   useEffect(() => {
     if (gameState.currentNumber && gameState.currentNumber !== prevNumRef.current) {
@@ -166,6 +187,33 @@ export default function Host() {
     { key: 'earlyFive', label: 'Early Five', icon: 'filter_5' },
     { key: 'fullHouse', label: 'Full House', icon: 'home' },
   ];
+
+  if (!authed) {
+    return (
+      <div className="host-page" style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100vh' }}>
+        <div style={{ background:'var(--bg2)', border:'1.5px solid var(--border2)', borderRadius:'var(--radius)', padding:'32px 24px', width:'100%', maxWidth:360 }}>
+          <div style={{ textAlign:'center', marginBottom:24 }}>
+            <span className="material-icons" style={{ fontSize:48, color:'var(--gold)' }}>lock</span>
+            <h2 style={{ color:'var(--text)', margin:'12px 0 4px', fontSize:22 }}>Host Access</h2>
+            <p style={{ color:'var(--text3)', fontSize:13 }}>Enter your host key to continue</p>
+          </div>
+          <input
+            type="password"
+            placeholder="Enter access key..."
+            value={keyInput}
+            onChange={e => setKeyInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            style={{ width:'100%', padding:'12px 14px', borderRadius:'var(--radius-sm)', border:'1.5px solid var(--border2)', background:'var(--bg3)', color:'var(--text)', fontSize:14, marginBottom:8, boxSizing:'border-box' }}
+          />
+          {keyError && <p style={{ color:'var(--red,#e05c6b)', fontSize:12, marginBottom:8 }}>{keyError}</p>}
+          <button className="btn btn-gold" style={{ width:'100%', marginTop:8 }} onClick={handleLogin}>
+            <span className="material-icons">vpn_key</span>
+            Unlock Host Panel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="host-page">
@@ -369,6 +417,19 @@ export default function Host() {
           </button>
         </section>
       </div>
+
+      {/* Logout */}
+      <section className="card" style={{ marginTop: 8 }}>
+        <div className="section-header">
+          <span className="material-icons">logout</span>
+          Session
+        </div>
+        <p className="danger-desc">Logging out will require the host key to access this panel again.</p>
+        <button className="btn btn-outline" onClick={handleLogout}>
+          <span className="material-icons">logout</span>
+          Logout
+        </button>
+      </section>
 
       {/* Players modal */}
       {showPlayers && (
