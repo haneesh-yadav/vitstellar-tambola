@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 
+// ─── Max Winners Per Prize ────────────────────────────────────────────────────
 const MAX_WINNERS = {
   topLine: 4,
   middleLine: 4,
@@ -12,7 +13,6 @@ const MAX_WINNERS = {
   earlyFive: 5,
   fullHouse: 3,
 };
-
 
 const app = express();
 const server = http.createServer(app);
@@ -34,10 +34,10 @@ app.use(express.json());
 // ─── Game State ──────────────────────────────────────────────────────────────
 
 let gameState = {
-  status: 'waiting', // waiting | running | paused | ended
+  status: 'waiting',
   calledNumbers: [],
   currentNumber: null,
-  players: {},       // socketId -> { name, ticket, claims }
+  players: {},
   hostSocketId: null,
   gameId: null,
   winners: {
@@ -52,56 +52,7 @@ let gameState = {
   autoCallDelay: 5000,
 };
 
-// ─── Tambola Ticket Generator ─────────────────────────────────────────────────
-
-function generateTicket() {
-  // Standard Tambola: 3 rows x 9 cols, 5 numbers per row (15 total)
-  // Col 0: 1-9, Col 1: 10-19, ..., Col 8: 80-90
-  const ticket = [[], [], []]; // 3 rows
-  const colRanges = [
-    [1, 9], [10, 19], [20, 29], [30, 39], [40, 49],
-    [50, 59], [60, 69], [70, 79], [80, 90],
-  ];
-
-  // For each column, pick 0, 1, 2, or 3 numbers ensuring each row has exactly 5
-  const grid = Array.from({ length: 3 }, () => Array(9).fill(null));
-  const rowCounts = [0, 0, 0];
-
-  // Assign numbers column by column
-  for (let col = 0; col < 9; col++) {
-    const [min, max] = colRanges[col];
-    const available = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-    shuffle(available);
-
-    // Decide how many numbers go in this column (0-3), ensuring rows fill up
-    const remaining = 9 - col;
-    const neededPerRow = [5 - rowCounts[0], 5 - rowCounts[1], 5 - rowCounts[2]];
-    const totalNeeded = neededPerRow.reduce((a, b) => a + b, 0);
-
-    // Max numbers this column can have: min(3, what we have space for)
-    // Min numbers: ensure remaining columns can still fill the rows
-    let minNums = Math.max(0, ...neededPerRow.map((n, i) => n - (remaining - 1)));
-    minNums = Math.max(minNums, 0);
-    let maxNums = Math.min(3, totalNeeded, available.length);
-
-    // Pick how many rows get a number in this column
-    const count = minNums + Math.floor(Math.random() * (maxNums - minNums + 1));
-
-    // Pick which rows
-    const rows = [0, 1, 2].sort(() => Math.random() - 0.5).slice(0, count);
-
-    // Assign sorted numbers to sorted rows
-    const nums = available.slice(0, count).sort((a, b) => a - b);
-    rows.sort((a, b) => a - b);
-    rows.forEach((row, i) => {
-      grid[row][col] = nums[i];
-      rowCounts[row]++;
-    });
-  }
-
-  // Validate and fix if any row doesn't have exactly 5
-  return grid;
-}
+// ─── Tambola Ticket Generator (Guaranteed 5 per row) ─────────────────────────
 
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -109,6 +60,50 @@ function shuffle(arr) {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
+}
+
+function generateTicket() {
+  const colRanges = [
+    [1, 9], [10, 19], [20, 29], [30, 39], [40, 49],
+    [50, 59], [60, 69], [70, 79], [80, 90],
+  ];
+
+  // Step 1: Build a pool of numbers for each column (shuffled)
+  const colPools = colRanges.map(([min, max]) => {
+    const nums = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+    return shuffle(nums);
+  });
+
+  // Step 2: Initialize 3x9 grid with nulls
+  const grid = Array.from({ length: 3 }, () => Array(9).fill(null));
+
+  // Step 3: For each row, pick exactly 5 columns to fill
+  for (let row = 0; row < 3; row++) {
+    // Shuffle column indices and pick 5
+    const colIndices = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 5).sort((a, b) => a - b);
+    for (const col of colIndices) {
+      // Pick a number from this column's pool
+      grid[row][col] = colPools[col].pop();
+    }
+  }
+
+  // Step 4: Sort numbers within each column in ascending order
+  for (let col = 0; col < 9; col++) {
+    const filled = [];
+    const filledRows = [];
+    for (let row = 0; row < 3; row++) {
+      if (grid[row][col] !== null) {
+        filled.push(grid[row][col]);
+        filledRows.push(row);
+      }
+    }
+    filled.sort((a, b) => a - b);
+    filledRows.forEach((row, i) => {
+      grid[row][col] = filled[i];
+    });
+  }
+
+  return grid;
 }
 
 function generateNumberBag() {
@@ -135,7 +130,7 @@ function checkWinConditions(ticket, calledNumbers) {
     called.has(topRow[0]) && called.has(topRow[topRow.length - 1]) &&
     called.has(botRow[0]) && called.has(botRow[botRow.length - 1]);
 
-  // Early Five: any 5 numbers called
+  // Early Five: any 5 numbers from ticket called
   const allNums = ticket.flat().filter(n => n !== null);
   const calledFromTicket = allNums.filter(n => called.has(n));
   results.earlyFive = calledFromTicket.length >= 5;
@@ -356,8 +351,8 @@ io.on('connection', (socket) => {
       player.claims.push(type);
 
       const isFull = gameState.winners[type].length >= MAX_WINNERS[type];
-      const winData = { 
-        type, 
+      const winData = {
+        type,
         player: { id: socket.id, name: player.name },
         winners: gameState.winners[type],
         isFull,
@@ -406,8 +401,7 @@ resetGame();
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`🎯 Tambola server running on port ${PORT}`));
 
-
 // Keep-alive ping
 setInterval(() => {
   console.log('keepalive');
-}, 1000 * 60 * 4); // every 4 minutes
+}, 1000 * 60 * 4);
