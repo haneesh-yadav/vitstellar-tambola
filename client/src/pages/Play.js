@@ -284,7 +284,7 @@ export default function Play() {
             <span className="material-icons">arrow_back</span>
           </button>
           <div>
-            <h1 className="play-title">VIT-STELLAR Tambola</h1>
+            <h1 className="play-title">Tambola</h1>
             <p className="play-welcome">Hey, {player?.name}! 👋</p>
           </div>
         </div>
