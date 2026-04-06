@@ -5,6 +5,7 @@ import NumberBoard from '../components/NumberBoard';
 import WinnerBanner from '../components/WinnerBanner';
 import { toast, ToastContainer } from '../components/Toast';
 import './Host.css';
+
 const HOST_KEY = 'cosmicwalk2026';
 
 const WIN_LABELS = {
@@ -14,6 +15,15 @@ const WIN_LABELS = {
   corners: 'Four Corners',
   earlyFive: 'Early Five',
   fullHouse: 'Full House',
+};
+
+const MAX_WINNERS = {
+  topLine: 4,
+  middleLine: 4,
+  bottomLine: 4,
+  corners: 4,
+  earlyFive: 5,
+  fullHouse: 3,
 };
 
 export default function Host() {
@@ -122,7 +132,7 @@ export default function Host() {
     socket.on('game:winner', (data) => {
       setGameState(prev => ({
         ...prev,
-        winners: { ...prev.winners, [data.type]: data.player },
+        winners: { ...prev.winners, [data.type]: data.winners },
       }));
       setWinnerEvent(data);
       toast(`🏆 ${data.player.name} won ${WIN_LABELS[data.type]}!`, 'gold');
@@ -382,19 +392,30 @@ export default function Host() {
           </div>
           <div className="host-winners">
             {winTypes.map(({ key, label, icon }) => {
-              const w = gameState.winners?.[key];
+              const w = Array.isArray(gameState.winners?.[key]) ? gameState.winners[key] : [];
+              const isFull = w.length >= MAX_WINNERS[key];
               return (
-                <div key={key} className={`hw-row ${w ? 'hw-row--won' : ''}`}>
+                <div key={key} className={`hw-row ${w.length > 0 ? 'hw-row--won' : ''}`}>
                   <div className="hw-left">
                     <span className="material-icons hw-icon">{icon}</span>
-                    <span className="hw-label">{label}</span>
+                    <div>
+                      <span className="hw-label">{label}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 6 }}>
+                        {w.length}/{MAX_WINNERS[key]}
+                      </span>
+                    </div>
                   </div>
                   <div className="hw-right">
-                    {w ? (
-                      <span className="hw-name">
-                        <span className="material-icons" style={{ fontSize: 14, color: 'var(--gold)' }}>verified</span>
-                        {w.name}
-                      </span>
+                    {w.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'flex-end' }}>
+                        {w.map((winner, i) => (
+                          <span key={i} className="hw-name">
+                            <span className="material-icons" style={{ fontSize: 13, color: 'var(--gold)' }}>verified</span>
+                            {winner.name}
+                          </span>
+                        ))}
+                        {!isFull && <span style={{ fontSize: 11, color: 'var(--text3)' }}>Still open...</span>}
+                      </div>
                     ) : (
                       <span className="hw-empty">Unclaimed</span>
                     )}
@@ -425,8 +446,6 @@ export default function Host() {
           </div>
         </section>
       </div>
-
-      
 
       {/* Players modal */}
       {showPlayers && (

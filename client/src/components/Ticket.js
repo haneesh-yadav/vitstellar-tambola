@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import './Ticket.css';
 
+const MAX_WINNERS = {
+  topLine: 4,
+  middleLine: 4,
+  bottomLine: 4,
+  corners: 4,
+  earlyFive: 5,
+  fullHouse: 3,
+};
+
 export default function Ticket({ ticket, calledNumbers, onClaim, winners, playerClaims = [], timerActive }) {
   if (!ticket) return null;
 
   const called = new Set(calledNumbers || []);
 
-  // markedNumbers: numbers the player has manually tapped/marked
   const [markedNumbers, setMarkedNumbers] = useState(new Set());
-
-  // When a new number is called, it becomes "markable" but NOT auto-marked
-  // When timer expires (timerActive goes false) for a given number, that window is closed.
-  // We track which numbers are currently "open" (can still be marked by player)
   const [openNumbers, setOpenNumbers] = useState(new Set());
 
   const latestCalled = calledNumbers?.length > 0
     ? calledNumbers[calledNumbers.length - 1]
     : null;
 
-  // When a new number is called, open it for marking
   useEffect(() => {
     if (latestCalled !== null && latestCalled !== undefined) {
       setOpenNumbers(prev => {
@@ -29,7 +32,6 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
     }
   }, [latestCalled]);
 
-  // When timer ends, close the latest number if not marked
   useEffect(() => {
     if (!timerActive && latestCalled !== null && latestCalled !== undefined) {
       setOpenNumbers(prev => {
@@ -40,7 +42,6 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
     }
   }, [timerActive, latestCalled]);
 
-  // Reset on game reset (calledNumbers becomes empty)
   useEffect(() => {
     if (!calledNumbers || calledNumbers.length === 0) {
       setMarkedNumbers(new Set());
@@ -49,9 +50,9 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
   }, [calledNumbers?.length]);
 
   function handleCellClick(num) {
-    if (!called.has(num)) return;           // not yet called
-    if (!openNumbers.has(num)) return;      // window closed
-    if (markedNumbers.has(num)) return;     // already marked
+    if (!called.has(num)) return;
+    if (!openNumbers.has(num)) return;
+    if (markedNumbers.has(num)) return;
 
     setMarkedNumbers(prev => {
       const next = new Set(prev);
@@ -69,7 +70,6 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
     { key: 'fullHouse', label: 'Full House', icon: 'home' },
   ];
 
-  // Win checks use markedNumbers (what the player actually tapped)
   function checkLocal(type) {
     if (!calledNumbers || calledNumbers.length === 0) return false;
     const rows = ticket;
@@ -105,14 +105,12 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
     <div className="ticket-wrapper">
       {/* Ticket grid */}
       <div className="ticket">
-        {/* Column headers */}
         <div className="ticket-headers">
           {[1,2,3,4,5,6,7,8,9].map((n, i) => (
             <div key={i} className="col-header">{n}</div>
           ))}
         </div>
 
-        {/* Rows */}
         {ticket.map((row, rowIdx) => (
           <div key={rowIdx} className="ticket-row">
             {row.map((num, colIdx) => {
@@ -166,21 +164,28 @@ export default function Ticket({ ticket, calledNumbers, onClaim, winners, player
           </p>
           <div className="claim-buttons">
             {winTypes.map(({ key, label, icon }) => {
-              const isWon = winners && winners[key];
+              const winnersArray = winners && Array.isArray(winners[key]) ? winners[key] : [];
+              const isFull = winnersArray.length >= MAX_WINNERS[key];
               const isMyClaim = playerClaims.includes(key);
               const isReady = checkLocal(key);
+              const isDisabled = isFull || isMyClaim;
 
               return (
                 <button
                   key={key}
-                  className={`claim-btn ${isWon ? 'claim-btn--won' : ''} ${isMyClaim ? 'claim-btn--mine' : ''} ${isReady && !isWon ? 'claim-btn--ready' : ''}`}
-                  onClick={() => !isWon && onClaim(key)}
-                  disabled={!!isWon}
-                  title={isWon ? `Won by ${winners[key]?.name}` : label}
+                  className={`claim-btn ${isFull ? 'claim-btn--won' : ''} ${isMyClaim ? 'claim-btn--mine' : ''} ${isReady && !isDisabled ? 'claim-btn--ready' : ''}`}
+                  onClick={() => !isDisabled && onClaim(key)}
+                  disabled={isDisabled}
+                  title={isFull ? 'All winners found' : isMyClaim ? 'Already claimed' : label}
                 >
-                  <span className="material-icons">{isMyClaim ? 'verified' : isWon ? 'lock' : icon}</span>
+                  <span className="material-icons">
+                    {isMyClaim ? 'verified' : isFull ? 'lock' : icon}
+                  </span>
                   <span>{label}</span>
-                  {isReady && !isWon && !isMyClaim && <span className="ready-dot" />}
+                  <span style={{ fontSize: 9, opacity: 0.7 }}>
+                    {winnersArray.length}/{MAX_WINNERS[key]}
+                  </span>
+                  {isReady && !isDisabled && <span className="ready-dot" />}
                 </button>
               );
             })}
