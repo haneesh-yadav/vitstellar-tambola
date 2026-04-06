@@ -4,6 +4,16 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 
+const MAX_WINNERS = {
+  topLine: 4,
+  middleLine: 4,
+  bottomLine: 4,
+  corners: 4,
+  earlyFive: 5,
+  fullHouse: 3,
+};
+
+
 const app = express();
 const server = http.createServer(app);
 
@@ -31,12 +41,12 @@ let gameState = {
   hostSocketId: null,
   gameId: null,
   winners: {
-    topLine: null,
-    middleLine: null,
-    bottomLine: null,
-    corners: null,
-    earlyFive: null,
-    fullHouse: null,
+    topLine: [],
+    middleLine: [],
+    bottomLine: [],
+    corners: [],
+    earlyFive: [],
+    fullHouse: [],
   },
   autoCallInterval: null,
   autoCallDelay: 5000,
@@ -153,12 +163,12 @@ function resetGame() {
     hostSocketId: gameState.hostSocketId,
     gameId: uuidv4(),
     winners: {
-      topLine: null,
-      middleLine: null,
-      bottomLine: null,
-      corners: null,
-      earlyFive: null,
-      fullHouse: null,
+      topLine: [],
+      middleLine: [],
+      bottomLine: [],
+      corners: [],
+      earlyFive: [],
+      fullHouse: [],
     },
     autoCallInterval: null,
     autoCallDelay: gameState.autoCallDelay || 5000,
@@ -250,8 +260,8 @@ io.on('connection', (socket) => {
     gameState.calledNumbers = [];
     gameState.currentNumber = null;
     gameState.winners = {
-      topLine: null, middleLine: null, bottomLine: null,
-      corners: null, earlyFive: null, fullHouse: null,
+      topLine: [], middleLine: [], bottomLine: [],
+      corners: [], earlyFive: [], fullHouse: [],
     };
 
     io.emit('game:started', getPublicState());
@@ -317,8 +327,15 @@ io.on('connection', (socket) => {
     const validTypes = ['topLine', 'middleLine', 'bottomLine', 'corners', 'earlyFive', 'fullHouse'];
     if (!validTypes.includes(type)) return;
 
-    if (gameState.winners[type]) {
-      socket.emit('claim:rejected', { type, reason: `${type} already claimed by ${gameState.winners[type].name}` });
+    // Check if already claimed by this player
+    if (player.claims.includes(type)) {
+      socket.emit('claim:rejected', { type, reason: 'You already claimed this prize' });
+      return;
+    }
+
+    // Check if max winners reached
+    if (gameState.winners[type].length >= MAX_WINNERS[type]) {
+      socket.emit('claim:rejected', { type, reason: `All ${MAX_WINNERS[type]} winners for ${type} already found!` });
       return;
     }
 
@@ -335,14 +352,20 @@ io.on('connection', (socket) => {
     const key = typeToCheck[type];
 
     if (wins[key]) {
-      gameState.winners[type] = { id: socket.id, name: player.name };
+      gameState.winners[type].push({ id: socket.id, name: player.name });
       player.claims.push(type);
 
-      const winData = { type, player: { id: socket.id, name: player.name } };
+      const isFull = gameState.winners[type].length >= MAX_WINNERS[type];
+      const winData = { 
+        type, 
+        player: { id: socket.id, name: player.name },
+        winners: gameState.winners[type],
+        isFull,
+      };
       io.emit('game:winner', winData);
       socket.emit('claim:accepted', { type });
 
-      console.log(`[WIN] ${player.name} -> ${type}`);
+      console.log(`[WIN] ${player.name} -> ${type} (${gameState.winners[type].length}/${MAX_WINNERS[type]})`);
     } else {
       socket.emit('claim:rejected', { type, reason: 'Numbers not matching. Keep playing!' });
     }
