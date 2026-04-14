@@ -245,7 +245,7 @@ export default function Play() {
               <label>Your Name</label>
               <input
                 className={`input ${nameError ? 'input-error' : ''}`}
-                placeholder="e.g. Arjun Kumar"
+                placeholder="e.g. Haneesh Yadav"
                 value={name}
                 onChange={e => { setName(e.target.value); setNameError(''); }}
                 autoFocus
