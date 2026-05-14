@@ -17,7 +17,7 @@ export default function Landing() {
         {/* Club badge */}
         <div className="club-badge">
           <img src="/stellar.png" alt="VIT-STELLAR" className="club-logo" />
-          <span>VIT-STELLAR</span>
+          <span>Haneesh Yadav</span>
         </div>
 
         {/* Title */}
@@ -25,7 +25,7 @@ export default function Landing() {
           <h1>
             <span className="title-main">TAMBOLA</span>
           </h1>
-          <p className="title-sub">The official housie game for Cosmic Walk 4.0</p>
+          <p className="title-sub">The official housie game for tambola lovers</p>
         </div>
 
         {/* Connection status */}
@@ -77,7 +77,7 @@ export default function Landing() {
         </div>
 
         <p className="footer-note">
-          COPYRIGHT © 2026 ASTRONOMY CLUB - VIT STELLAR
+          COPYRIGHT © 2026 HANEESH
         </p>
       </div>
     </div>
