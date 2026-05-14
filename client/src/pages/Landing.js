@@ -16,7 +16,7 @@ export default function Landing() {
       <div className="landing-content animate-fadeUp">
         {/* Club badge */}
         <div className="club-badge">
-          <img src="/stellar.png" alt="VIT-STELLAR" className="club-logo" />
+          {/*<img src="/stellar.png" alt="VIT-STELLAR" className="club-logo" />*/}
           <span>Haneesh Yadav</span>
         </div>
 
